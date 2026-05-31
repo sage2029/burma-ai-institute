@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Burmese Artificial Intelligence Research Institute</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-void: #04060f;
+    --bg-deep: #080d1c;
+    --bg-surface: #0d1628;
+    --bg-card: #101c35;
+    --bg-card-hover: #152040;
+    --border: rgba(99,160,255,0.12);
+    --border-bright: rgba(99,160,255,0.28);
+    --accent-blue: #4f9cff;
+    --accent-violet: #9b6dff;
+    --accent-cyan: #22e5ff;
+    --accent-glow: rgba(79,156,255,0.18);
+    --text-primary: #eef3ff;
+    --text-secondary: #8da5cc;
+    --text-muted: #4a6285;
+    --text-accent: #4f9cff;
+    --mono: 'DM Mono', monospace;
+    --serif: 'Instrument Serif', serif;
+    --sans: 'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-void); }
+  ::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 2px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 5%;
+    background: rgba(4,6,15,0.82);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent-blue);
+    box-shadow: 0 0 10px var(--accent-blue);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+  .nav-links {
+    display: flex; gap: 36px; list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.12em;
+    color: var(--text-secondary); text-decoration: none; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent-blue); }
+
+  .nav-cta {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em;
+    padding: 8px 18px; border: 1px solid var(--border-bright);
+    color: var(--accent-blue); background: transparent;
+    text-decoration: none; text-transform: uppercase;
+    transition: all 0.25s; cursor: pointer;
+  }
+  .nav-cta:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 18px rgba(79,156,255,0.2);
+  }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    padding: 120px 5% 80px;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 40%, rgba(79,156,255,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 80% 20%, rgba(155,109,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 20% 80%, rgba(34,229,255,0.04) 0%, transparent 60%);
+  }
+
+  /* Neural Net SVG canvas */
+  .neural-canvas {
+    position: absolute; inset: 0; pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative; z-index: 2;
+    max-width: 860px; text-align: center;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.3em;
+    color: var(--accent-blue); text-transform: uppercase;
+    margin-bottom: 28px;
+    display: inline-flex; align-items: center; gap: 12px;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: ''; width: 32px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-blue));
+  }
+  .hero-eyebrow::after { background: linear-gradient(90deg, var(--accent-blue), transparent); }
+
+  .hero-headline {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 6.5vw, 6.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+  .hero-headline .upright { font-style: normal; }
+  .hero-headline .grad {
+    background: linear-gradient(135deg, #4f9cff 0%, #9b6dff 50%, #22e5ff 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-family: var(--sans); font-weight: 400; font-size: 1.05rem;
+    color: var(--text-secondary); max-width: 560px; margin: 0 auto 48px;
+    line-height: 1.75;
+  }
+
+  .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-primary {
+    padding: 14px 36px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+    color: #fff; font-family: var(--mono); font-size: 0.78rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    border: none; cursor: pointer; text-decoration: none;
+    position: relative; overflow: hidden;
+    transition: all 0.3s;
+    box-shadow: 0 0 32px rgba(79,156,255,0.25);
+  }
+  .btn-primary:hover { box-shadow: 0 0 48px rgba(79,156,255,0.45); transform: translateY(-2px); }
+
+  .btn-ghost {
+    padding: 14px 36px;
+    background: transparent; color: var(--text-primary);
+    font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em;
+    text-transform: uppercase; border: 1px solid var(--border-bright);
+    cursor: pointer; text-decoration: none; transition: all 0.3s;
+  }
+  .btn-ghost:hover { border-color: var(--accent-blue); color: var(--accent-blue); background: var(--accent-glow); }
+
+  .hero-stats {
+    display: flex; justify-content: center; gap: 48px;
+    margin-top: 72px; padding-top: 48px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: var(--mono); font-size: 2rem; font-weight: 500;
+    color: var(--accent-blue);
+    display: block;
+  }
+  .stat-label {
+    font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em;
+    color: var(--text-muted); text-transform: uppercase; margin-top: 4px;
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 100px 5%; }
+
+  .section-header { margin-bottom: 64px; }
+  .section-tag {
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.3em;
+    color: var(--accent-blue); text-transform: uppercase;
+    margin-bottom: 14px; display: block;
+  }
+  .section-title {
+    font-family: var(--serif); font-style: italic;
+    font-size: clamp(2rem, 3.5vw, 3.2rem);
+    line-height: 1.15; color: var(--text-primary);
+  }
+  .section-title .upright { font-style: normal; }
+  .section-desc {
+    font-size: 0.95rem; color: var(--text-secondary);
+    margin-top: 16px; max-width: 540px; line-height: 1.75;
+  }
+
+  /* ── RESEARCH FOCUS ── */
+  #research { background: var(--bg-deep); }
+
+  .research-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .research-card {
+    background: var(--bg-card);
+    padding: 44px 36px;
+    position: relative; overflow: hidden;
+    transition: background 0.3s;
+    cursor: default;
+  }
+  .research-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--card-accent, var(--accent-blue)), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .research-card:hover { background: var(--bg-card-hover); }
+  .research-card:hover::before { opacity: 1; }
+
+  .rc-number {
+    font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.25em;
+    color: var(--text-muted); margin-bottom: 24px; display: block;
+  }
+  .rc-icon {
+    width: 48px; height: 48px; margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border);
+    color: var(--card-accent, var(--accent-blue));
+    font-size: 1.3rem;
+  }
+  .rc-title {
+    font-family: var(--sans); font-weight: 700; font-size: 1.05rem;
+    color: var(--text-primary); margin-bottom: 12px; line-height: 1.3;
+  }
+  .rc-desc { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.7; }
+  .rc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+  .rc-tag {
+    font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em;
+    padding: 3px 8px; border: 1px solid var(--border);
+    color: var(--text-muted); text-transform: uppercase;
+  }
+
+  /* ── TEAM ── */
+  #team { background: var(--bg-void); }
+
+  .founders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-bottom: 80px;
+  }
+
+  .founder-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    padding: 40px 32px;
+    position: relative; overflow: hidden;
+    transition: all 0.3s;
+  }
+  .founder-card.primary {
+    border-color: var(--border-bright);
+    background: linear-gradient(145deg, var(--bg-surface), rgba(79,156,255,0.04));
+  }
+  .founder-card:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-4px);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px var(--border-bright);
+  }
+  .founder-badge {
+    font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.25em;
+    text-transform: uppercase; padding: 4px 10px;
+    border: 1px solid; margin-bottom: 28px; display: inline-block;
+  }
+  .founder-badge.lead { color: var(--accent-blue); border-color: rgba(79,156,255,0.3); background: rgba(79,156,255,0.06); }
+  .founder-badge.co { color: var(--accent-violet); border-color: rgba(155,109,255,0.3); background: rgba(155,109,255,0.06); }
+
+  .founder-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--bg-card), var(--bg-card-hover));
+    border: 2px solid var(--border-bright);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    font-family: var(--mono); font-size: 1.4rem; color: var(--accent-blue);
+    font-weight: 500;
+    position: relative;
+  }
+  .founder-avatar::after {
+    content: '';
+    position: absolute; inset: -4px; border-radius: 50%;
+    border: 1px solid var(--border);
+  }
+
+  .founder-name {
+    font-family: var(--sans); font-weight: 700; font-size: 1.15rem;
+    color: var(--text-primary); margin-bottom: 6px;
+  }
+  .founder-title {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em;
+    color: var(--text-secondary); line-height: 1.5;
+  }
+  .founder-line {
+    width: 32px; height: 1px;
+    background: linear-gradient(90deg, var(--accent-blue), transparent);
+    margin: 16px 0;
+  }
+  .founder-bio { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
+
+  /* Research Members */
+  .members-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 32px;
+  }
+  .members-title {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.2em;
+    color: var(--text-secondary); text-transform: uppercase;
+  }
+  .members-line { flex: 1; height: 1px; background: var(--border); }
+
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .member-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    padding: 24px 20px;
+    transition: all 0.25s;
+    position: relative;
+  }
+  .member-card:hover {
+    border-color: var(--border-bright);
+    background: var(--bg-card);
+  }
+  .member-idx {
+    font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.2em;
+    color: var(--text-muted); margin-bottom: 14px; display: block;
+  }
+  .member-avatar-sm {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--bg-card-hover);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 0.9rem; color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+  .member-name {
+    font-family: var(--sans); font-weight: 600; font-size: 0.9rem;
+    color: var(--text-primary); margin-bottom: 4px;
+  }
+  .member-role {
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.06em;
+    color: var(--accent-blue); margin-bottom: 6px; line-height: 1.4;
+  }
+  .member-affil {
+    font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  /* ── PUBLICATIONS ── */
+  #publications { background: var(--bg-deep); }
+
+  .pub-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media(max-width:800px){ .pub-layout { grid-template-columns: 1fr; } }
+
+  .pub-section-title {
+    font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.25em;
+    color: var(--text-muted); text-transform: uppercase;
+    margin-bottom: 20px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pub-item {
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    padding: 28px;
+    margin-bottom: 16px;
+    position: relative; overflow: hidden;
+    transition: all 0.25s; cursor: pointer;
+  }
+  .pub-item:hover { border-color: var(--border-bright); background: var(--bg-card-hover); }
+  .pub-item::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(180deg, var(--accent-blue), var(--accent-violet));
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .pub-item:hover::before { opacity: 1; }
+
+  .pub-venue {
+    font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em;
+    color: var(--accent-blue); text-transform: uppercase; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pub-year {
+    color: var(--text-muted); font-size: 0.58rem;
+  }
+  .pub-title {
+    font-family: var(--sans); font-weight: 600; font-size: 0.92rem;
+    color: var(--text-primary); line-height: 1.45; margin-bottom: 10px;
+  }
+  .pub-authors {
+    font-family: var(--mono); font-size: 0.65rem; color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .pub-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+  .pub-tag {
+    font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.08em;
+    padding: 2px 8px; border: 1px solid var(--border); color: var(--text-muted);
+  }
+  .pub-tag.hot { border-color: rgba(34,229,255,0.3); color: var(--accent-cyan); }
+
+  /* Projects */
+  .project-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 16px;
+    transition: all 0.25s;
+  }
+  .project-card:hover { border-color: var(--border-bright); }
+  .project-status {
+    font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.2em;
+    text-transform: uppercase; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .status-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .active .status-dot { background: #22e5ff; box-shadow: 0 0 6px #22e5ff; }
+  .active { color: var(--accent-cyan); }
+  .ongoing .status-dot { background: var(--accent-violet); box-shadow: 0 0 6px var(--accent-violet); }
+  .ongoing { color: var(--accent-violet); }
+
+  .project-title {
+    font-family: var(--sans); font-weight: 700; font-size: 0.95rem;
+    color: var(--text-primary); margin-bottom: 10px;
+  }
+  .project-desc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.65; }
+  .project-meta {
+    display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap;
+  }
+  .project-meta span {
+    font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--bg-void);
+    border-top: 1px solid var(--border);
+    padding: 72px 5% 40px;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px; margin-bottom: 64px;
+  }
+  @media(max-width:900px){ .footer-grid { grid-template-columns: 1fr 1fr; } }
+  @media(max-width:560px){ .footer-grid { grid-template-columns: 1fr; } }
+
+  .footer-brand .logo {
+    font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.2em;
+    color: var(--accent-blue); text-transform: uppercase; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .footer-brand .logo .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-blue); box-shadow: 0 0 8px var(--accent-blue);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .footer-brand p {
+    font-size: 0.82rem; color: var(--text-muted); line-height: 1.75; max-width: 280px;
+  }
+
+  .footer-col h4 {
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.2em;
+    color: var(--text-secondary); text-transform: uppercase; margin-bottom: 18px;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 10px; }
+  .footer-col ul li a {
+    font-size: 0.82rem; color: var(--text-muted); text-decoration: none;
+    transition: color 0.2s; font-family: var(--mono);
+  }
+  .footer-col ul li a:hover { color: var(--accent-blue); }
+
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: gap;
+    gap: 16px;
+  }
+  .footer-copy {
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+  .footer-socials { display: flex; gap: 12px; }
+  .social-btn {
+    width: 34px; height: 34px; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); text-decoration: none; font-size: 0.75rem;
+    transition: all 0.2s;
+  }
+  .social-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0 5%;
+  }
+
+  /* ── FADE IN ── */
+  .fade-up {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── MOBILE NAV ── */
+  .menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+  .menu-toggle span { width: 22px; height: 1px; background: var(--text-secondary); display: block; transition: all 0.3s; }
+
+  @media(max-width:768px) {
+    .nav-links, .nav-cta { display: none; }
+    .menu-toggle { display: flex; }
+    .nav-links.open {
+      display: flex; flex-direction: column;
+      position: fixed; top: 60px; left: 0; right: 0;
+      background: var(--bg-void); border-bottom: 1px solid var(--border);
+      padding: 24px 5%; gap: 20px;
+    }
+  }
+
+  /* ── GRID LINES BG ── */
+  .grid-overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.35;
+  }
+
+  .founder-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+}
+
+
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo">
+    <span class="dot"></span>
+    Burmese Artificial Intelligence Research Institute
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#research">Research</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#publications">Publications</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="mailto:contact@nexusailab.org" class="nav-cta">Get in Touch</a>
+  <div class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Neural Network SVG -->
+  <svg class="neural-canvas" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <radialGradient id="nodeGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#4f9cff" stop-opacity="0.8"/>
+        <stop offset="100%" stop-color="#9b6dff" stop-opacity="0.2"/>
+      </radialGradient>
+    </defs>
+    <!-- Layer 1 nodes -->
+    <g opacity="0.55" filter="url(#glow)">
+      <circle cx="80" cy="200" r="3.5" fill="#4f9cff" class="nn-node"/>
+      <circle cx="80" cy="330" r="3.5" fill="#4f9cff" class="nn-node"/>
+      <circle cx="80" cy="460" r="3.5" fill="#4f9cff" class="nn-node"/>
+      <circle cx="80" cy="590" r="3.5" fill="#4f9cff" class="nn-node"/>
+      <circle cx="80" cy="720" r="3.5" fill="#4f9cff" class="nn-node"/>
+      <!-- Layer 2 -->
+      <circle cx="240" cy="265" r="3.5" fill="#9b6dff" class="nn-node"/>
+      <circle cx="240" cy="395" r="3.5" fill="#9b6dff" class="nn-node"/>
+      <circle cx="240" cy="525" r="3.5" fill="#9b6dff" class="nn-node"/>
+      <circle cx="240" cy="655" r="3.5" fill="#9b6dff" class="nn-node"/>
+      <!-- Layer 3 -->
+      <circle cx="400" cy="200" r="4" fill="#22e5ff" class="nn-node"/>
+      <circle cx="400" cy="330" r="4" fill="#22e5ff" class="nn-node"/>
+      <circle cx="400" cy="460" r="4" fill="#22e5ff" class="nn-node"/>
+      <circle cx="400" cy="590" r="4" fill="#22e5ff" class="nn-node"/>
+      <circle cx="400" cy="720" r="4" fill="#22e5ff" class="nn-node"/>
+      <!-- Right side -->
+      <circle cx="1060" cy="200" r="3.5" fill="#4f9cff" class="nn-node"/>
+      <circle cx="1060" cy="330" r="3.5" fill="#4f9cff" class="nn-node"/>
+      <circle cx="1060" cy="460" r="3.5" fill="#4f9cff" class="nn-node"/>
+      <circle cx="1060" cy="590" r="3.5" fill="#4f9cff" class="nn-node"/>
+      <circle cx="1060" cy="720" r="3.5" fill="#4f9cff" class="nn-node"/>
+      <circle cx="1200" cy="265" r="3.5" fill="#9b6dff"/>
+      <circle cx="1200" cy="395" r="3.5" fill="#9b6dff"/>
+      <circle cx="1200" cy="525" r="3.5" fill="#9b6dff"/>
+      <circle cx="1200" cy="655" r="3.5" fill="#9b6dff"/>
+      <circle cx="1360" cy="200" r="4" fill="#22e5ff"/>
+      <circle cx="1360" cy="330" r="4" fill="#22e5ff"/>
+      <circle cx="1360" cy="460" r="4" fill="#22e5ff"/>
+      <circle cx="1360" cy="590" r="4" fill="#22e5ff"/>
+      <circle cx="1360" cy="720" r="4" fill="#22e5ff"/>
+    </g>
+    <!-- Connections L1-->
+    <g stroke="#4f9cff" stroke-opacity="0.08" stroke-width="1">
+      <line x1="80" y1="200" x2="240" y2="265"/><line x1="80" y1="200" x2="240" y2="395"/>
+      <line x1="80" y1="330" x2="240" y2="265"/><line x1="80" y1="330" x2="240" y2="395"/>
+      <line x1="80" y1="330" x2="240" y2="525"/>
+      <line x1="80" y1="460" x2="240" y2="395"/><line x1="80" y1="460" x2="240" y2="525"/>
+      <line x1="80" y1="590" x2="240" y2="525"/><line x1="80" y1="590" x2="240" y2="655"/>
+      <line x1="80" y1="720" x2="240" y2="655"/>
+      <line x1="240" y1="265" x2="400" y2="200"/><line x1="240" y1="265" x2="400" y2="330"/>
+      <line x1="240" y1="395" x2="400" y2="330"/><line x1="240" y1="395" x2="400" y2="460"/>
+      <line x1="240" y1="525" x2="400" y2="460"/><line x1="240" y1="525" x2="400" y2="590"/>
+      <line x1="240" y1="655" x2="400" y2="590"/><line x1="240" y1="655" x2="400" y2="720"/>
+      <line x1="1060" y1="200" x2="1200" y2="265"/><line x1="1060" y1="200" x2="1200" y2="395"/>
+      <line x1="1060" y1="330" x2="1200" y2="265"/><line x1="1060" y1="330" x2="1200" y2="395"/>
+      <line x1="1060" y1="460" x2="1200" y2="395"/><line x1="1060" y1="460" x2="1200" y2="525"/>
+      <line x1="1060" y1="590" x2="1200" y2="525"/><line x1="1060" y1="590" x2="1200" y2="655"/>
+      <line x1="1060" y1="720" x2="1200" y2="655"/>
+      <line x1="1200" y1="265" x2="1360" y2="200"/><line x1="1200" y1="265" x2="1360" y2="330"/>
+      <line x1="1200" y1="395" x2="1360" y2="330"/><line x1="1200" y1="395" x2="1360" y2="460"/>
+      <line x1="1200" y1="525" x2="1360" y2="460"/><line x1="1200" y1="525" x2="1360" y2="590"/>
+      <line x1="1200" y1="655" x2="1360" y2="590"/><line x1="1200" y1="655" x2="1360" y2="720"/>
+    </g>
+    <!-- Animated signals -->
+    <circle r="3" fill="#4f9cff" opacity="0.8" filter="url(#glow)">
+      <animateMotion dur="3s" repeatCount="indefinite" path="M80,200 L240,265 L400,330"/>
+      <animate attributeName="opacity" values="0;1;1;0" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="2.5" fill="#9b6dff" opacity="0.8" filter="url(#glow)">
+      <animateMotion dur="4s" repeatCount="indefinite" begin="1s" path="M80,590 L240,525 L400,460"/>
+      <animate attributeName="opacity" values="0;1;1;0" dur="4s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+    <circle r="2.5" fill="#22e5ff" opacity="0.8" filter="url(#glow)">
+      <animateMotion dur="3.5s" repeatCount="indefinite" begin="0.5s" path="M1060,330 L1200,395 L1360,460"/>
+      <animate attributeName="opacity" values="0;1;1;0" dur="3.5s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle r="3" fill="#4f9cff" opacity="0.8" filter="url(#glow)">
+      <animateMotion dur="5s" repeatCount="indefinite" begin="2s" path="M1060,720 L1200,655 L1360,590"/>
+      <animate attributeName="opacity" values="0;1;1;0" dur="5s" repeatCount="indefinite" begin="2s"/>
+    </circle>
+  </svg>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">Pioneering Language & Intelligence Research</div>
+    <h1 class="hero-headline">
+      <span class="upright grad">Decoding</span> the<br/>
+      Language of<br/>
+      <em>Machine Minds</em>
+    </h1>
+    <p class="hero-sub">
+      We advance the frontiers of Natural Language Processing, low-resource AI, and computational perception—building systems that understand and generate human language with unprecedented depth.
+    </p>
+    <div class="hero-actions">
+      <a href="#research" class="btn-primary">Explore Research</a>
+      <a href="#publications" class="btn-ghost">View Publications</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">47+</span><span class="stat-label">Publications</span></div>
+      <div class="stat"><span class="stat-num">12</span><span class="stat-label">Active Projects</span></div>
+      <div class="stat"><span class="stat-num">8</span><span class="stat-label">Languages Studied</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label">Research Areas</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- RESEARCH FOCUS -->
+<section id="research">
+  <div class="section-header fade-up">
+    <span class="section-tag">// 01 — Core Domains</span>
+    <h2 class="section-title">Research <span class="upright">Focus</span></h2>
+    <p class="section-desc">Our lab pushes boundaries across three interconnected research pillars, each addressing fundamental challenges in artificial intelligence.</p>
+  </div>
+
+  <div class="research-grid fade-up">
+    <div class="research-card" style="--card-accent: #4f9cff;">
+      <span class="rc-number">// 01</span>
+      <div class="rc-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      </div>
+      <div class="rc-title">Low-Resource Natural Language Processing</div>
+      <p class="rc-desc">Developing robust NLP models for under-represented and morphologically complex languages, including Burmese and other Southeast Asian scripts, where labeled data is scarce.</p>
+      <div class="rc-tags">
+        <span class="rc-tag">Tokenization</span>
+        <span class="rc-tag">Transfer Learning</span>
+        <span class="rc-tag">Multilingual LLMs</span>
+      </div>
+    </div>
+
+    <div class="research-card" style="--card-accent: #9b6dff;">
+      <span class="rc-number">// 02</span>
+      <div class="rc-icon" style="color: var(--accent-violet);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 015 19.07M4.93 4.93A10 10 0 0019 19.07"/></svg>
+      </div>
+      <div class="rc-title">Machine Learning & Deep Architectures</div>
+      <p class="rc-desc">Investigating novel transformer architectures, efficient attention mechanisms, and self-supervised learning paradigms for scaling AI systems across resource-constrained environments.</p>
+      <div class="rc-tags">
+        <span class="rc-tag">Transformers</span>
+        <span class="rc-tag">Self-Supervised</span>
+        <span class="rc-tag">Efficient ML</span>
+      </div>
+    </div>
+
+    <div class="research-card" style="--card-accent: #22e5ff;">
+      <span class="rc-number">// 03</span>
+      <div class="rc-icon" style="color: var(--accent-cyan);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <div class="rc-title">Computational Perception & Multimodal AI</div>
+      <p class="rc-desc">Bridging language, vision, and audio modalities to build unified perceptual systems capable of understanding the world through multiple sensory channels simultaneously.</p>
+      <div class="rc-tags">
+        <span class="rc-tag">Vision-Language</span>
+        <span class="rc-tag">Speech NLP</span>
+        <span class="rc-tag">Multimodal</span>
+      </div>
+    </div>
+
+    <div class="research-card" style="--card-accent: #ff6b9d;">
+      <span class="rc-number">// 04</span>
+      <div class="rc-icon" style="color: #ff6b9d; border-color: rgba(255,107,157,0.3);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z"/><path d="M12 8v8M8 12h8"/></svg>
+      </div>
+      <div class="rc-title">Responsible AI & Fairness</div>
+      <p class="rc-desc">Examining bias, fairness, and cultural representation in large language models, with a focus on ensuring AI systems serve diverse global communities equitably.</p>
+      <div class="rc-tags">
+        <span class="rc-tag">Bias Detection</span>
+        <span class="rc-tag">AI Ethics</span>
+        <span class="rc-tag">Evaluation</span>
+      </div>
+    </div>
+
+    <div class="research-card" style="--card-accent: #ffb347;">
+      <span class="rc-number">// 05</span>
+      <div class="rc-icon" style="color: #ffb347; border-color: rgba(255,179,71,0.3);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2M8 12h8M8 16h5"/></svg>
+      </div>
+      <div class="rc-title">Information Extraction & Knowledge Graphs</div>
+      <p class="rc-desc">Automated extraction of structured knowledge from unstructured text at scale, powering next-generation search, reasoning, and question-answering systems.</p>
+      <div class="rc-tags">
+        <span class="rc-tag">NER</span>
+        <span class="rc-tag">Relation Extraction</span>
+        <span class="rc-tag">Knowledge Graphs</span>
+      </div>
+    </div>
+
+    <div class="research-card" style="--card-accent: #4dffb4;">
+      <span class="rc-number">// 06</span>
+      <div class="rc-icon" style="color: #4dffb4; border-color: rgba(77,255,180,0.3);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="rc-title">Robotics & Embodied Language Agents</div>
+      <p class="rc-desc">Combining NLP with robotic control systems to create language-conditioned agents that navigate and manipulate physical environments through natural instruction.</p>
+      <div class="rc-tags">
+        <span class="rc-tag">Embodied AI</span>
+        <span class="rc-tag">HRI</span>
+        <span class="rc-tag">Planning</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- TEAM -->
+<section id="team">
+  <div class="section-header fade-up">
+    <span class="section-tag">// 02 — The People</span>
+    <h2 class="section-title">Our <span class="upright">Team</span></h2>
+    <p class="section-desc">A multidisciplinary group of researchers united by a shared mission to advance the science of language and intelligence.</p>
+  </div>
+
+  <!-- Founders -->
+  <div class="founders-grid fade-up">
+    <div class="founder-card primary">
+      <span class="founder-badge lead">Founder</span>
+      <div class="founder-avatar"><img src="profile.jpg" alt="Aung Ko Ko Oo"></div>
+      <div class="founder-name">Aung Ko Ko Oo</div>
+      <div class="founder-title">Founder & Lead AI Researcher</div>
+      <div class="founder-line"></div>
+      <p class="founder-bio">Pioneering research in low-resource NLP for Southeast Asian languages, with a focus on Burmese morphology, neural machine translation, and indigenous language preservation through computational methods.</p>
+    </div>
+
+    <div class="founder-card">
+      <span class="founder-badge co">Co-Founder</span>
+      <div class="founder-avatar" style="color: var(--accent-violet); border-color: rgba(155,109,255,0.4);">TN</div>
+      <div class="founder-name">Hlaing Phyoe Thu</div>
+      <div class="founder-title">Co-Founder & Educational Specialist</div>
+      <div class="founder-line" style="background: linear-gradient(90deg, var(--accent-violet), transparent);"></div>
+      <p class="founder-bio">Educational specialist focused on integrating AI into learning environments, developing curricula that leverage NLP for enhanced language education.</p>
+    </div>
+
+    <div class="founder-card">
+      <span class="founder-badge co">Co-Founder</span>
+      <div class="founder-avatar" style="color: var(--accent-cyan); border-color: rgba(34,229,255,0.4);">YM</div>
+      <div class="founder-name">Zarni Minn Nyan</div>
+      <div class="founder-title">Co-Founder & Artificial Intelligence Researcher</div>
+      <div class="founder-line" style="background: linear-gradient(90deg, var(--accent-cyan), transparent);"></div>
+      <p class="founder-bio">Bridges natural language processing with robotic perception and control, developing language-conditioned manipulation systems and conversational interfaces for human-robot collaboration.</p>
+    </div>
+  </div>
+
+  <!-- Research Members -->
+  <!--div class="members-header fade-up">
+    <span class="members-title">Research Members</span>
+    <div class="members-line"></div>
+    <span class="members-title" style="color: var(--text-muted);">10 Members</span>
+  </div>
+
+  <!-- Members Grid -->
+  <!--div class="members-grid fade-up">
+    <!-- Member cards 1–10 -->
+    <!--script>
+      const members = [
+        { num:"01", init:"M1", name:"Member One",   role:"NLP Research Associate",       affil:"University of Yangon" },
+        { num:"02", init:"M2", name:"Member Two",   role:"ML Engineer – Perception",     affil:"MIIT, Myanmar" },
+        { num:"03", init:"M3", name:"Member Three", role:"Computational Linguist",       affil:"University of Mandalay" },
+        { num:"04", init:"M4", name:"Member Four",  role:"Deep Learning Researcher",     affil:"National University of Singapore" },
+        { num:"05", init:"M5", name:"Member Five",  role:"Speech & Audio NLP",           affil:"NECTEC, Thailand" },
+        { num:"06", init:"M6", name:"Member Six",   role:"Knowledge Graph Engineer",     affil:"Tohoku University" },
+        { num:"07", init:"M7", name:"Member Seven", role:"Multimodal AI Researcher",     affil:"Carnegie Mellon University" },
+        { num:"08", init:"M8", name:"Member Eight", role:"Bias & Fairness Specialist",   affil:"AI4D Africa" },
+        { num:"09", init:"M9", name:"Member Nine",  role:"Robotics Research Associate",  affil:"University of Tokyo" },
+        { num:"10", init:"MA", name:"Member Ten",   role:"NLP Evaluation & Benchmarking",affil:"Nexus AI Lab" },
+      ];
+      document.write(members.map(m => `
+        <div class="member-card">
+          <span class="member-idx">// ${m.num}</span>
+          <div class="member-avatar-sm">${m.init}</div>
+          <div class="member-name">${m.name}</div>
+          <div class="member-role">${m.role}</div>
+          <div class="member-affil">${m.affil}</div>
+        </div>
+      `).join(''));
+    </script>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PUBLICATIONS & PROJECTS -->
+<section id="publications">
+  <div class="section-header fade-up">
+    <span class="section-tag">// 03 — Output</span>
+    <h2 class="section-title">Publications <span class="upright">&amp; Projects</span></h2>
+    <p class="section-desc">Peer-reviewed research and active development initiatives that represent our core intellectual contributions to the field.</p>
+  </div>
+
+  <div class="pub-layout fade-up">
+    <!-- Publications Column -->
+    <div>
+      <div class="pub-section-title">Recent Publications</div>
+
+      <div class="pub-item">
+        <div class="pub-venue">ACL 2025 <span class="pub-year">· 2025</span></div>
+        <div class="pub-title">BurmeseBERT: Pretraining Large Language Models for Low-Resource Burmese NLP</div>
+        <div class="pub-authors">Aung Ko Ko Oo, Thant Zin Naung, et al.</div>
+        <div class="pub-tags">
+          <span class="pub-tag hot">Featured</span>
+          <span class="pub-tag">Low-Resource NLP</span>
+          <span class="pub-tag">Language Models</span>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-venue">EMNLP 2024 <span class="pub-year">· 2024</span></div>
+        <div class="pub-title">Cross-Lingual Transfer for Morphologically Rich Languages: A Unified Framework</div>
+        <div class="pub-authors">Thant Zin Naung, Aung Ko Ko Oo, Member Three</div>
+        <div class="pub-tags">
+          <span class="pub-tag">Transfer Learning</span>
+          <span class="pub-tag">Morphology</span>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-venue">ICRA 2024 <span class="pub-year">· 2024</span></div>
+        <div class="pub-title">Language-Conditioned Manipulation via Compositional Instruction Parsing</div>
+        <div class="pub-authors">Yan Min Htut, Member Nine, Member Seven</div>
+        <div class="pub-tags">
+          <span class="pub-tag">Robotics</span>
+          <span class="pub-tag">Embodied AI</span>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-venue">NAACL 2024 <span class="pub-year">· 2024</span></div>
+        <div class="pub-title">Evaluating Bias in Multilingual Language Models Across Southeast Asian Languages</div>
+        <div class="pub-authors">Member Eight, Thant Zin Naung, Member Five</div>
+        <div class="pub-tags">
+          <span class="pub-tag">AI Fairness</span>
+          <span class="pub-tag">Evaluation</span>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-venue">COLING 2024 <span class="pub-year">· 2024</span></div>
+        <div class="pub-title">Myanmar Script Tokenization: A Neural Approach to Syllable Segmentation</div>
+        <div class="pub-authors">Aung Ko Ko Oo, Member One, Member Three</div>
+        <div class="pub-tags">
+          <span class="pub-tag">Tokenization</span>
+          <span class="pub-tag">Burmese NLP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projects Column -->
+    <div>
+      <div class="pub-section-title">Active Research Projects</div>
+
+      <div class="project-card">
+        <div class="project-status active"><span class="status-dot"></span> Active</div>
+        <div class="project-title">Project Padauk — Myanmar Language Foundation Model</div>
+        <p class="project-desc">Building a 7B parameter foundation model trained on 50GB+ of curated Burmese text, with instruction tuning for downstream NLP tasks across Southeast Asian dialects.</p>
+        <div class="project-meta">
+          <span>🗓 2024 – 2026</span>
+          <span>🤝 5 partner institutions</span>
+          <span>🧠 Foundation Models</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-status active"><span class="status-dot"></span> Active</div>
+        <div class="project-title">NexusVision — Multimodal Document Understanding</div>
+        <p class="project-desc">Vision-language model for complex document parsing, combining OCR, layout analysis, and natural language reasoning for Burmese and English administrative documents.</p>
+        <div class="project-meta">
+          <span>🗓 2025 – Present</span>
+          <span>🧠 Multimodal AI</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-status ongoing"><span class="status-dot"></span> Ongoing</div>
+        <div class="project-title">RoboLang — Conversational Human-Robot Interfaces</div>
+        <p class="project-desc">End-to-end system enabling natural language control of robotic arms in industrial settings, with real-time grounding, error correction, and uncertainty estimation.</p>
+        <div class="project-meta">
+          <span>🗓 2023 – Present</span>
+          <span>🤖 Robotics + NLP</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-status ongoing"><span class="status-dot"></span> Ongoing</div>
+        <div class="project-title">SEAL Benchmark — Southeast Asian Language Evaluation</div>
+        <p class="project-desc">Comprehensive benchmark suite covering 12 NLP tasks across 8 Southeast Asian languages, with standardized evaluation protocols for future model comparisons.</p>
+        <div class="project-meta">
+          <span>🗓 2024 – Present</span>
+          <span>📊 Benchmarking</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo"><span class="dot"></span> Burmese Artificial Intelligence Research Institute</div>
+      <p>Advancing the frontiers of natural language understanding and machine intelligence—particularly for languages and communities underrepresented in AI research.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Research</h4>
+      <ul>
+        <li><a href="#research">Low-Resource NLP</a></li>
+        <li><a href="#research">Machine Learning</a></li>
+        <li><a href="#research">Comp. Perception</a></li>
+        <li><a href="#research">Robotics & Language</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Lab</h4>
+      <ul>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#publications">Publications</a></li>
+        <li><a href="#publications">Projects</a></li>
+        <li><a href="#">Open Datasets</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:contact@nexusailab.org">AungKoKoOo@my.uopeople.edu</a></li>
+        <li><a href="#">Collaboration</a></li>
+        <li><a href="#">Join the Lab</a></li>
+        <li><a href="#">Press & Media</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 Burmese Artificial Intelligence Research Institute · All rights reserved</span>
+    <div class="footer-socials">
+      <a href="https://github.com/sage2029" class="social-btn" title="GitHub">GH</a>
+      <br><a href="https://www.facebook.com/share/1D6sH7ffyy/?mibextid=wwXIfr" class="social-btn" title="Facebook">FB</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Intersection observer for fade-up animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Stagger child cards in grids
+  document.querySelectorAll('.research-grid, .founders-grid, .members-grid').forEach(grid => {
+    grid.querySelectorAll(':scope > *').forEach((child, i) => {
+      child.style.transitionDelay = (i * 60) + 'ms';
+      child.classList.add('fade-up');
+      observer.observe(child);
+    });
+  });
+
+  // Pub items
+  document.querySelectorAll('.pub-item, .project-card').forEach((el, i) => {
+    el.style.transitionDelay = (i * 50) + 'ms';
+    el.classList.add('fade-up');
+    observer.observe(el);
+  });
+
+  // Nav scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').style.boxShadow =
+      window.scrollY > 40 ? '0 8px 32px rgba(0,0,0,0.6)' : 'none';
+  });
+</script>
+</body>
+</html>
